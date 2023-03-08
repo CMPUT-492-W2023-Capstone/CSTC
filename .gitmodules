@@ -7,3 +7,6 @@
 [submodule "pytorch-YOLOv4"]
 	path = pytorch-YOLOv4
 	url = git@github.com:Tianxiaomo/pytorch-YOLOv4.git
+[submodule "yolor"]
+	path = yolor
+	url = git@github.com:WongKinYiu/yolor.git
