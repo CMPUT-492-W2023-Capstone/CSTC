@@ -79,3 +79,4 @@ fabric.properties
 app/credential
 app/training_datasets
 app/models
+__pycache__
