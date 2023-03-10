@@ -84,3 +84,4 @@ app/src/darknet
 app/src/data
 app/src/models
 app/src/utils
+app/src/yolov8
