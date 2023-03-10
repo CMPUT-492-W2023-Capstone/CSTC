@@ -13,5 +13,6 @@ algorithm_config:
   init_args:
     conf_thres: 0.4
     iou_thres: 0.5
+    fp16: True
     tracking_method: OCSORT
     tracking_config: tracking_configs/ocsort.yaml
