@@ -76,7 +76,7 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-app/credentials
+app/credential
 app/training_datasets
 app/models
 app/src/cfg
