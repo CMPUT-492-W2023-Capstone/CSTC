@@ -78,3 +78,5 @@ fabric.properties
 
 app/credential
 app/datasets
+app/models
+app/training_datasets
