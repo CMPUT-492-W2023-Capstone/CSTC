@@ -175,6 +175,7 @@ class AlgorithmConfig:
             self,
             agnostic_nms: bool = False,
             augment: bool = False,
+            classify: bool = False,
             class_filter: list[int] = None,
             conf_thres: float = 0.25,
             device: ComputingDevice = ComputingDevice.CPU,
