@@ -132,6 +132,8 @@ def main(
                     result[0:4]
                 )
 
+                # TODO: Update to the database -- Rucha
+
                 box_annotator = tracked_object.label_annotator(box_annotator, output_video_config)
 
             stream_result(box_annotator, im0, source_path, streaming_windows)
