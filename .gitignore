@@ -79,10 +79,3 @@ fabric.properties
 app/credential
 app/training_datasets
 app/models
-app/src/cfg
-app/src/darknet
-app/src/data
-app/src/models
-app/src/utils
-app/src/yolov8
-app/src/trackers
