@@ -11,6 +11,9 @@ from yolov8.ultralytics.yolo.utils.plotting import Annotator, colors
 
 from algorithm import DetectionTask, TrackingTask
 from configuration import InputConfig, OutputVideoConfig, OutputResultConfig, AlgorithmConfig
+import firebase_admin
+from firebase_admin import firestore
+
 
 
 class TrackedObject:
@@ -133,6 +136,18 @@ def main(
                 )
 
                 # TODO: Update to the database -- Rucha
+
+                # Application Default credentials are automatically created.
+                app = firebase_admin.initialize_app()
+                db = firestore.client()
+
+                doc_ref = db.collection(u'camera').document(u'vehicle_data')
+                doc_ref.set({
+                    u'id': u'',
+                    u'vehicle_type': u'',
+                    u'born': 1815
+                })
+                snippets.py
 
                 box_annotator = tracked_object.label_annotator(box_annotator, output_video_config)
 
