@@ -2,16 +2,19 @@ input_config:
   class_path: configuration.InputConfig
   init_args:
     media_source: /home/dekr0/Videos/test.mp4
-    yolo_models: ../models/yolor_p6.pt
+    yolo_models: ../models/yolor_p6_v1/best_overall.pt
     device: "0"
 output_video_config:
   class_path: configuration.OutputVideoConfig
+  init_args:
+      vid_frame_stride: 1
+      class_names: classes.names
 output_result_config:
   class_path: configuration.OutputResultConfig
 algorithm_config:
   class_path: configuration.AlgorithmConfig
   init_args:
-    conf_thres: 0.4
+    conf_thres: 0.6
     iou_thres: 0.5
     fp16: True
     tracking_method: OCSORT
