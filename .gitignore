@@ -80,4 +80,4 @@ app/crediential
 app/training_datasets
 app/training_history
 app/models
-__pycache__
+**/__pycache__
