@@ -4,3 +4,6 @@
 [submodule "app/yolov7-object-tracking"]
 	path = app/yolov7-object-tracking
 	url = git@github.com:RizwanMunawar/yolov7-object-tracking.git
+[submodule "yolov7"]
+	path = yolov7
+	url = git@github.com:WongKinYiu/yolov7.git
