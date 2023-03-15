@@ -78,5 +78,6 @@ fabric.properties
 
 app/crediential
 app/training_datasets
+app/training_history
 app/models
 __pycache__
