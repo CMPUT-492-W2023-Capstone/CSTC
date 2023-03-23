@@ -12,29 +12,42 @@ from yolov8.ultralytics.yolo.utils.plotting import Annotator, colors
 from algorithm import DetectionTask, TrackingTask
 from configuration import InputConfig, OutputVideoConfig, OutputResultConfig, AlgorithmConfig
 import firebase_admin
+from firebase_admin import credentials
 from firebase_admin import firestore
-
 
 
 class TrackedObject:
 
-    def __init__(self, t_id: int = -1, vehicle_type: str = '', confidence: int = -1, bbox: list = None):
+    @staticmethod
+    def format(t_id, vehicle_type, confi, bbox):
+        coord = f'x1: {bbox[0]}, x2: {bbox[2]}, y1: {bbox[1]}, y2: {bbox[3]}'
+
+        return f'Vehicle id {t_id} : type: {vehicle_type} | confidence: ' \
+               f'{round(confi)} | ' f'{coord}'
+
+    def __init__(self, t_id: int = -1, vehicle_type: str = '', confidence: float = -1, bbox: list = None):
         self.t_id = t_id
         self.vehicle_type = vehicle_type
         self.confidence = confidence
         self.bbox = bbox
 
-    def label_annotator(self, box_annotator: Annotator, config: OutputVideoConfig):
-        label = None
-        if not config.hide_labels:
-            class_label = None if config.hide_class else f'{self.vehicle_type}'
-            confidence_label = None if config.hide_conf else f'{self.confidence:.2f}'
+    def update(self, vehicle_type, bbox):
+        self.vehicle_type = vehicle_type
+        self.bbox = bbox
 
-            label = f'{self.t_id} {class_label} {confidence_label}'
+    def __hash__(self):
+        return self.t_id
 
-        box_annotator.box_label(self.bbox, label, color=colors(1, True))
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) \
+               and getattr(other, 't_id', None) == self.t_id \
+               and getattr(other, 'vehicle_type') == self.vehicle_type
 
-        return box_annotator
+    def __str__(self):
+        return self.format(self.t_id, self.vehicle_type, self.confidence, self.bbox)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 def stream_result(box_annotator: Annotator, im0, source_path: Path,
@@ -51,6 +64,20 @@ def stream_result(box_annotator: Annotator, im0, source_path: Path,
 
     if cv2.waitKey(1) == ord('q'):
         exit()
+
+
+def label_annotator(t_id, vehicle_type, confidence, bbox, box_annotator: Annotator,
+                    config: OutputVideoConfig):
+    label = None
+    if not config.hide_labels:
+        class_label = None if config.hide_class else f'{vehicle_type}'
+        confidence_label = None if config.hide_conf else f'{confidence:.2f}'
+
+        label = f'{t_id} {class_label} {confidence_label}'
+
+    box_annotator.box_label(bbox, label, color=colors(1, True))
+
+    return box_annotator
 
 
 def main(
@@ -88,6 +115,8 @@ def main(
     )
 
     results = [[]] * media_dataset_size
+
+    vehicles: dict[int, TrackedObject] = dict()
 
     # OpenCV convention : im means image after modify, im0 means copy
     # of the image before modification (i.e. original image)
@@ -128,12 +157,23 @@ def main(
                 continue
 
             for result in results[i]:
-                tracked_object: TrackedObject = TrackedObject(
-                    result[4],
-                    class_names[int(result[5])],
-                    result[6],
-                    result[0:4]
-                )
+                if len(result) == 7:
+                    t_id = int(result[4])
+                    vehicle_type = class_names[int(result[5])]
+                    confi = result[6]
+                    bbox = result[0:4]
+
+                    print(TrackedObject.format(t_id, vehicle_type, confi, bbox))
+
+                    box_annotator = label_annotator(t_id, vehicle_type, confi, bbox,
+                                                    box_annotator, output_video_config)
+
+                    if t_id not in vehicles:
+                        vehicles[t_id] = TrackedObject(t_id, vehicle_type, confi, bbox)
+                    else:
+                        vehicles[t_id].update(vehicle_type, bbox)
+
+                box_annotator = label_annotator(box_annotator, output_video_config)
 
                 # TODO: Update to the database -- Rucha
 
@@ -141,15 +181,12 @@ def main(
                 app = firebase_admin.initialize_app()
                 db = firestore.client()
 
+                # only uploads the id and vehicle type, not time yet
                 doc_ref = db.collection(u'camera').document(u'vehicle_data')
                 doc_ref.set({
-                    u'id': u'',
-                    u'vehicle_type': u'',
-                    u'born': 1815
+                    u'id': u't_id',
+                    u'vehicle_type': u'vehicle_type'
                 })
-                snippets.py
-
-                box_annotator = tracked_object.label_annotator(box_annotator, output_video_config)
 
             stream_result(box_annotator, im0, source_path, streaming_windows)
 
